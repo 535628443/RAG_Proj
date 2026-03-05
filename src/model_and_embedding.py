@@ -16,11 +16,13 @@ EMBEDDING_PROVIDER = "Ollama"
 
 # --- 逻辑区 ---
 def get_embedding_function():
-     """返回本地 Ollama 的嵌入工具"""
+    """返回本地 Ollama 的嵌入工具"""
     return OllamaEmbeddings(
         model = OLLAMA_EMBEDDING_NAME,
         embed_instruction = "文档：",
-        query_instruction = "询问："
-    """bge-m3在处理“知识库里的文字”和“用户问的问题”时
-     加上这两个前缀，它能更精准地把“问题”和“知识”匹配在一起"""
+        query_instruction = "询问：",
     )
+    """bge-m3在处理“知识库里的文字”和“用户问的问题”时
+    加上这两个前缀，它能更精准地把“问题”和“知识”匹配在一起"""
+
+EMBEDDING_NAME = OLLAMA_EMBEDDING_NAME
