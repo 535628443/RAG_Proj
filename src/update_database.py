@@ -32,7 +32,9 @@ help="是否重新构建数据库, 默认是False")
     # -- 表示可选参数, 定义了按钮的名字(reset), 没有--表示位置参数(必须填)
     # action 表示命令行出现了arts.reset就把 args.reset设为True,(默认为False) 
     # help 表示 --reset 的说明书
-    args = parser.parse_args() # 根据之前定义的规则, 把这串文本“翻译”成一个Python对象
+    args = parser.parse_args() 
+    # .parse_args()会自动识别命令行输入的参数, 比如你输入了 --reset, 
+    # 那么 args.reset 就是 True; 如果你没有输入 --reset, 那么 args.reset 就是 False
 
     if args.reset:
         clear_database()
@@ -49,3 +51,31 @@ def clear_database():
     if DATASET_PATH.exists():
         print(f"✨ 正在清理旧数据库：{DATASET_PATH}")
         shutil.rmtree(DATASET_PATH) # 删除整个文件夹
+
+def load_documents():
+    """读取 data/documents下所有的PDF文件"""
+    print(f"📂 正在加载文档：{DOCUMENT_PATH}")
+    loader = PyPDFDirectoryLoader(DOCUMENT_PATH) 
+    # PyPDFDirectoryLoader可以读取目录下所有PDF文件的地址
+    return loader.load() 
+    # .load()会根据地址对PDF进行操作, 变成Document对象, 并返回一个list[Document]结构
+
+def split_documents(documents: list[Document]):
+    #documents: list[Document]表示这个函数的输入是一个Document对象的列表(冒号表示注解)
+    """把长文档切成1000字上下的片段, overlap 是为了让片段之间有200字的重复, 防止语义在切分点被切断"""
+    print("🔪 正在切分文档...")
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000, 
+        chunk_overlap=200,
+        add_start_index = True)
+    # chunk_size是每个碎片的最大长度
+    # chunk_overlap是碎片之间的重叠部分(为了保持上下文连续)
+    # add_start_index=True记录碎片在原文中的起始位置(比如碎片从第二页第101个字符开始)
+    
+    return text_splitter.split_documents(documents)
+    # 1. 循环遍历这个 list[Document]，对每个 Document 进行切分
+    # 2. 读取它的 .page_content
+    # 3. 按照 1000 字一段进行split, 每段之间重叠 200 字
+    # 4. 对每个切好的碎片，创建一个新的 Document 对象
+    # 5. 在新的 Document 对象的 metadata 中，记录原文档的 metadata 和这个碎片在原文中的起始位置
+    # 6. 最后返回一个新的 list[Document]，里面的每个 Document 都是一个切好的碎片
