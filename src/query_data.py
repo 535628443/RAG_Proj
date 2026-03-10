@@ -1,4 +1,3 @@
-
 import argparse
 from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
@@ -12,8 +11,7 @@ PROMPT_TEMPLATE = """
 你是一位专业的糖尿病医生。请根据以下提供的医学背景信息来回答患者的问题。
 如果背景信息中没有提到相关内容，请诚实告知，不要胡乱编造。
 
-背景信息：
-{context}
+背景信息：{context}
 
 ---
 
@@ -54,9 +52,12 @@ def query_rag(query_text: str):
     print("\n⏳ 正在思考中，请稍候...")
     response_text = model.invoke(prompt)
 
-    # 6. 打印最终结果
+    # 6. 打印并返回结果
+    unique_sources = list(set(sources))
     print(f"\n🤖 DeepSeek 的回答：\n{response_text}")
-    print(f"\n🔖 参考来源：{list(set(sources))}")
+    print(f"\n🔖 参考来源：{unique_sources}")
+    
+    return response_text, unique_sources
 
 if __name__ == "__main__":
     main()

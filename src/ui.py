@@ -10,7 +10,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- 2. 界面样式定制 (加上一点医疗蓝的感觉) ---
+# --- 2. 界面样式定制 ---
 st.markdown("""
     <style>
     .main {
