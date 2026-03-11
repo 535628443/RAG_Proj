@@ -63,6 +63,15 @@ def load_documents():
 
 def split_documents(documents: list[Document]):
     #documents: list[Document] 表示这个函数的输入是一个 Document 对象的列表(冒号表示注解)
+    """
+    Document(
+    page_content="糖尿病患者应注意控制糖分摄入, 建议每日运动30分钟...", 
+    metadata={
+        'source': 'data/source/中国2型糖尿病防治指南.pdf', 
+        'page': 45
+    }
+    )
+    """
     """把长文档切成1000字上下的片段, overlap 是为了让片段之间有200字的重复, 防止语义在切分点被切断"""
     print("🔪 正在切分文档...")
     text_splitter = RecursiveCharacterTextSplitter(

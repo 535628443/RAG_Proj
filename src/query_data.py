@@ -4,7 +4,6 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama import OllamaLLM
 from model_and_embedding import get_embedding_function
 
-# 数据库路径
 CHROMA_PATH = "data/chroma_bge-m3"
 
 PROMPT_TEMPLATE = """
@@ -44,13 +43,20 @@ def query_rag(query_text: str):
     
     # 4. 构造 Prompt
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
+    # .from_template(): 扫描字符串，自动识别出所有被大括号 { } 包围的内容（{context} 和 {question}）
+    # 确保后续你调用 .format() 时，如果你少传了参数，它能立刻报错提醒你
     prompt = prompt_template.format(context=context_text, question=query_text)
+    # .format(): 把 PROMPT_TEMPLATE 里的 {context} 和 {question} 替换成你传入的真实内容
 
     # 5. 调用 Ollama (DeepSeek)
     model = OllamaLLM(model="deepseek-r1:1.5b")
     
     print("\n⏳ 正在思考中，请稍候...")
     response_text = model.invoke(prompt)
+    # 打包发货：程序把拼接好的那段长长的 prompt（包含背景和问题）打包
+    # 网络请求：通过 API 请求，把它发送给正在后台运行的 Ollama 服务
+    # 模型思考：本地运行的 DeepSeek-R1 接收到指令，开始进行逻辑推理和文字生成
+    # 结果签收：生成完回答后，.invoke() 会把这一串字符串抓回来，赋值给变量 response_text
 
     # 6. 打印并返回结果
     unique_sources = list(set(sources))
@@ -58,6 +64,7 @@ def query_rag(query_text: str):
     print(f"\n🔖 参考来源：{unique_sources}")
     
     return response_text, unique_sources
+    # 返回一个tuple (response_text, unique_sources)
 
 if __name__ == "__main__":
     main()
